@@ -1,47 +1,562 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>한지찬 | 백엔드 개발 기록</title>
-  <meta name="description" content="Spring Boot, JPA, 테스트 코드, 동시성 제어에 대한 백엔드 개발 기록">
-  <meta name="google-site-verification" content="XzZNkqBmi6J7pJtrEB9Xe2Ecl3oV72hHxFdoauPPGYo" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+  <title>한지찬 | 백엔드 개발 기록과 기술 노트</title>
+
+  <meta name="description"
+        content="Java와 Spring Boot 백엔드 개발 경험을 바탕으로 동시성 제어, Lost Update, 테스트 코드, JPA, 시스템 설계와 분산 트랜잭션을 정리합니다.">
+
+  <meta name="google-site-verification"
+        content="XzZNkqBmi6J7pJtrEB9Xe2Ecl3oV72hHxFdoauPPGYo">
+
+  <link rel="canonical"
+        href="https://hjc96.github.io/">
+
   <style>
-    body { max-width: 720px; margin: 40px auto; padding: 0 20px;
-           font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
-           line-height: 1.7; color: #222; }
-    h1 { font-size: 1.6rem; }
-    h2 { font-size: 1.2rem; margin-top: 2em; }
-    a { color: #0366d6; }
-    li { margin-bottom: 6px; }
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Apple SD Gothic Neo",
+        "Malgun Gothic",
+        sans-serif;
+      line-height: 1.8;
+      color: #24292f;
+      background: #ffffff;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    a {
+      color: #0969da;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    h1, h2, h3 {
+      line-height: 1.45;
+    }
+
+    h1 {
+      margin-bottom: 12px;
+      font-size: 2rem;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 1.45rem;
+    }
+
+    h3 {
+      font-size: 1.18rem;
+    }
+
+    p {
+      margin: 12px 0;
+    }
+
+    header {
+      padding-bottom: 32px;
+      border-bottom: 1px solid #d8dee4;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: #57606a;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    main section {
+      margin-top: 48px;
+    }
+
+    .intro {
+      padding: 24px;
+      background: #f6f8fa;
+      border-radius: 12px;
+    }
+
+    .article {
+      padding: 24px 0;
+      border-bottom: 1px solid #d8dee4;
+    }
+
+    .article h3 {
+      margin-top: 0;
+    }
+
+    .article ul {
+      padding-left: 24px;
+    }
+
+    .tag {
+      display: inline-block;
+      margin: 4px 4px 4px 0;
+      padding: 3px 10px;
+      border-radius: 16px;
+      background: #ddf4ff;
+      color: #0550ae;
+      font-size: 0.82rem;
+    }
+
+    .read-more {
+      display: inline-block;
+      margin-top: 8px;
+      font-weight: 600;
+    }
+
+    footer {
+      margin-top: 60px;
+      padding-top: 24px;
+      border-top: 1px solid #d8dee4;
+      color: #57606a;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 24px 16px 60px;
+      }
+
+      h1 {
+        font-size: 1.65rem;
+      }
+
+      .intro {
+        padding: 18px;
+      }
+    }
   </style>
 </head>
-<body>
-  <h1>한지찬 — 백엔드 개발자</h1>
-  <p>Spring Boot, JPA, 테스트 코드, 동시성 제어를 주로 다룹니다.
-     개발하면서 정리한 내용을 블로그에 기록하고 있습니다.</p>
 
-  <h2>전체 글 목록</h2>
-  <p>
-    <a href="https://m.blog.naver.com/gkswlcjs2/222496454152">백엔드 개발 블로그 글 모음 — Spring · JPA · 테스트 · 회고</a>
+<body>
+
+<header>
+  <h1>한지찬 | 백엔드 개발 기록</h1>
+
+  <p class="subtitle">
+    Java · Spring Boot · Software Architecture
   </p>
 
-  <h2>주요 글</h2>
-  <ul>
-    <li><a href="https://m.blog.naver.com/gkswlcjs2/224157559684">Spring Boot 3.4 @MockBean Deprecated: @MockitoBean 사용법과 마이그레이션 주의점</a></li>
-    <li><a href="https://m.blog.naver.com/gkswlcjs2/223969911803">MySQL 이중화 Master-Slave vs Active-Standby</a></li>
-    <li><a href="https://m.blog.naver.com/gkswlcjs2/223948291259">MockMvc vs Rest-Assured</a></li>
-    <li><a href="https://m.blog.naver.com/gkswlcjs2/223950698323">Swagger로 API Test Code 뽑아내기: openapi-generator</a></li>
-    <li><a href="https://m.blog.naver.com/gkswlcjs2/224369322094">재고 감소부터 분산 트랜잭션까지(동시성 문제를 바라보는 세 가지 관점)</a></li>
-    <li><a href="https://m.blog.naver.com/gkswlcjs2/224386963301">편집 충돌을 감지해서 Lost Update 막기</a></li>
-    <li><a href="https://m.blog.naver.com/gkswlcjs2/223994625056">Spring Boot 테스트 격리: DB 데이터와 컨텍스트를 분리하는 방법</a></li>
-    <li><a href="https://m.blog.naver.com/gkswlcjs2/224190989586">테크 블로그 통합 검색 서비스 개발 회고: Spring Boot·React·AWS</a></li>
-  </ul>
+  <p>
+    백엔드 개발을 하며 마주한 문제와
+    이를 해결하는 과정에서 배운 내용을 기록합니다.
+  </p>
 
-  <h2>링크</h2>
-  <ul>
-    <li><a href="https://github.com/HJC96">GitHub</a></li>
-    <li><a href="https://m.blog.naver.com/gkswlcjs2">블로그</a></li>
-  </ul>
+  <nav aria-label="주요 메뉴">
+    <a href="#about">소개</a>
+    <a href="#engineering">기술 경험</a>
+    <a href="#articles">기술 글</a>
+    <a href="#links">외부 링크</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- 개발자 소개 -->
+
+  <section id="about">
+
+    <h2>About Me</h2>
+
+    <div class="intro">
+
+      <p>
+        안녕하세요. Java와 Spring Boot를 기반으로
+        백엔드 서비스를 개발하고 있는 한지찬입니다.
+      </p>
+
+      <p>
+        임베디드 소프트웨어 개발을 시작으로
+        차량 보안 시스템, 인증서 발급 시스템,
+        보안키 관리 시스템 등의 백엔드 개발을
+        경험했습니다.
+      </p>
+
+      <p>
+        단순히 기능을 구현하는 것을 넘어,
+        테스트하기 좋은 코드를 작성하고
+        데이터의 정합성을 유지하며,
+        변경에 유연한 시스템을 설계하는 데
+        관심이 있습니다.
+      </p>
+
+      <p>
+        최근에는 객체지향 설계, 헥사고날 아키텍처,
+        분산 시스템과 시스템 설계를 공부하며
+        실무에서 배운 내용을 정리하고 있습니다.
+      </p>
+
+      <span class="tag">Java</span>
+      <span class="tag">Spring Boot</span>
+      <span class="tag">JPA</span>
+      <span class="tag">MySQL</span>
+      <span class="tag">Testing</span>
+      <span class="tag">System Design</span>
+
+    </div>
+
+  </section>
+
+
+  <!-- 기술 경험 -->
+
+  <section id="engineering">
+
+    <h2>Engineering Notes</h2>
+
+    <p>
+      백엔드 개발 과정에서 중요하게 생각하는
+      기술적 문제와 설계 경험을 소개합니다.
+    </p>
+
+
+    <article class="article">
+
+      <h3>1. 동시성 제어와 데이터 정합성</h3>
+
+      <p>
+        여러 사용자가 동일한 데이터를 수정하는
+        환경에서는 먼저 저장한 내용이
+        나중에 들어온 요청에 의해 사라지는
+        Lost Update 문제가 발생할 수 있습니다.
+      </p>
+
+      <p>
+        실제로 여러 담당자가 하나의 문서를 수정하는
+        기능을 개발하면서 비관적 락,
+        네임드 락, 낙관적 락을 검토했습니다.
+      </p>
+
+      <p>
+        사람이 브라우저에서 문서를 수정하는 경우
+        조회부터 저장까지의 시간을 하나의
+        DB 트랜잭션으로 관리하기는 어렵습니다.
+      </p>
+
+      <p>
+        이를 해결하기 위해 문서를 조회할 때의
+        버전을 클라이언트에 전달하고,
+        저장 요청에서 해당 버전을 검증하는
+        낙관적 오프라인 락을 선택했습니다.
+      </p>
+
+      <p>
+        기존 문서의 수정 충돌뿐 아니라
+        최초 저장 시 발생할 수 있는
+        중복 삽입 문제도 함께 검토했습니다.
+      </p>
+
+      <a class="read-more"
+         href="https://m.blog.naver.com/gkswlcjs2/224386963301">
+        Lost Update 방지를 위한
+        동시성 제어 글 읽기 →
+      </a>
+
+    </article>
+
+
+    <article class="article">
+
+      <h3>2. 테스트하기 좋은 백엔드 설계</h3>
+
+      <p>
+        테스트 코드를 도입하면서
+        가장 중요하게 생각하게 된 것은
+        테스트 라이브러리의 사용법보다
+        프로덕션 코드의 설계였습니다.
+      </p>
+
+      <p>
+        외부 시스템이나 데이터베이스에
+        강하게 결합된 코드는
+        독립적으로 검증하기 어렵습니다.
+      </p>
+
+      <p>
+        이를 개선하기 위해 외부 의존성을 분리하고,
+        Mockito와 WireMock을 활용해
+        외부 시스템의 응답과 장애 상황을
+        테스트하는 방법을 학습하고 적용했습니다.
+      </p>
+
+      <p>
+        또한 Testcontainers를 활용해
+        실제 MySQL 환경을 사용하는 통합 테스트를
+        구성하고, 테스트 간 데이터와
+        애플리케이션 컨텍스트를
+        격리하는 방법을 고민했습니다.
+      </p>
+
+      <a class="read-more"
+         href="https://m.blog.naver.com/gkswlcjs2/223994625056">
+        Spring Boot 테스트 격리 방법 읽기 →
+      </a>
+
+    </article>
+
+
+    <article class="article">
+
+      <h3>3. 분산 시스템과 트랜잭션</h3>
+
+      <p>
+        여러 서비스가 하나의 비즈니스 기능을
+        처리하는 분산 시스템에서는
+        단일 데이터베이스 트랜잭션만으로
+        모든 작업의 일관성을 보장하기 어렵습니다.
+      </p>
+
+      <p>
+        예를 들어 주문 과정에서 재고 감소,
+        결제 요청, 주문 저장이
+        서로 다른 서비스에서 수행된다면
+        일부 작업만 성공했을 때의 처리 방법을
+        고민해야 합니다.
+      </p>
+
+      <p>
+        이러한 문제를 공부하면서
+        분산 트랜잭션과 보상 트랜잭션,
+        중복 요청을 안전하게 처리하기 위한
+        멱등성의 필요성을 살펴봤습니다.
+      </p>
+
+      <p>
+        특히 재시도가 가능한 시스템에서는
+        동일한 요청이 여러 번 도착하더라도
+        의도하지 않은 중복 처리가 발생하지
+        않도록 설계하는 것이 중요합니다.
+      </p>
+
+      <a class="read-more"
+         href="https://m.blog.naver.com/gkswlcjs2/224369322094">
+        재고 감소부터 분산 트랜잭션까지 읽기 →
+      </a>
+
+    </article>
+
+
+    <article class="article">
+
+      <h3>4. 변경에 유연한 소프트웨어 아키텍처</h3>
+
+      <p>
+        테스트하기 좋은 코드를 고민하면서
+        객체지향 설계와 헥사고날 아키텍처에
+        관심을 갖게 되었습니다.
+      </p>
+
+      <p>
+        비즈니스 로직을 외부 시스템과
+        분리하고 의존성의 방향을 관리하면
+        외부 기술이 변경되더라도
+        핵심 도메인 로직에 미치는 영향을
+        줄일 수 있습니다.
+      </p>
+
+      <p>
+        최근에는 포트와 어댑터를 이용한
+        컴포넌트 간 의존성 분리,
+        ArchUnit을 활용한 아키텍처 규칙 검증,
+        도메인 모델과 영속성 모델의
+        책임 분리 등을 공부하고 있습니다.
+      </p>
+
+    </article>
+
+  </section>
+
+
+  <!-- 기술 글 목록 -->
+
+  <section id="articles">
+
+    <h2>Technical Articles</h2>
+
+    <p>
+      Java, Spring Boot, 테스트 코드,
+      데이터베이스와 시스템 설계를 공부하며
+      작성한 기술 글입니다.
+    </p>
+
+
+    <article class="article">
+
+      <h3>
+        Spring Boot 3.4
+        @MockBean Deprecated
+      </h3>
+
+      <p>
+        Spring Boot 3.4에서 deprecated된
+        @MockBean과 대체 애노테이션인
+        @MockitoBean을 살펴봅니다.
+        기존 테스트 코드를 변경할 때
+        확인해야 할 부분을 정리한 글입니다.
+      </p>
+
+      <a class="read-more"
+         href="https://m.blog.naver.com/gkswlcjs2/224157559684">
+        @MockBean 마이그레이션 글 읽기 →
+      </a>
+
+    </article>
+
+
+    <article class="article">
+
+      <h3>
+        MySQL 이중화:
+        Master-Slave vs Active-Standby
+      </h3>
+
+      <p>
+        데이터베이스의 가용성을 높이기 위한
+        이중화 구조를 살펴봅니다.
+        Master-Slave와 Active-Standby의
+        개념을 비교하며 데이터베이스
+        이중화 구조를 이해하기 위한 글입니다.
+      </p>
+
+      <a class="read-more"
+         href="https://m.blog.naver.com/gkswlcjs2/223969911803">
+        MySQL 이중화 글 읽기 →
+      </a>
+
+    </article>
+
+
+    <article class="article">
+
+      <h3>MockMvc vs REST Assured</h3>
+
+      <p>
+        Spring Boot에서 API 테스트를
+        작성할 때 사용할 수 있는
+        MockMvc와 REST Assured를 비교합니다.
+        두 테스트 도구의 사용 방법과
+        선택 기준을 살펴볼 수 있습니다.
+      </p>
+
+      <a class="read-more"
+         href="https://m.blog.naver.com/gkswlcjs2/223948291259">
+        MockMvc와 REST Assured 비교 글 읽기 →
+      </a>
+
+    </article>
+
+
+    <article class="article">
+
+      <h3>
+        OpenAPI Generator를 활용한
+        API 테스트 코드 생성
+      </h3>
+
+      <p>
+        Swagger와 OpenAPI Generator를
+        활용해 API 테스트 코드를
+        생성하는 방법을 살펴봅니다.
+      </p>
+
+      <a class="read-more"
+         href="https://m.blog.naver.com/gkswlcjs2/223950698323">
+        API 테스트 코드 생성 글 읽기 →
+      </a>
+
+    </article>
+
+
+    <article class="article">
+
+      <h3>
+        테크 블로그 통합 검색 서비스 개발 회고
+      </h3>
+
+      <p>
+        Spring Boot, React, AWS를 활용해
+        테크 블로그 통합 검색 서비스를
+        개발하면서 경험한 내용을 정리했습니다.
+      </p>
+
+      <a class="read-more"
+         href="https://m.blog.naver.com/gkswlcjs2/224190989586">
+        사이드 프로젝트 개발 회고 읽기 →
+      </a>
+
+    </article>
+
+  </section>
+
+
+  <!-- 외부 링크 -->
+
+  <section id="links">
+
+    <h2>More About Me</h2>
+
+    <p>
+      더 자세한 기술 글과 프로젝트는
+      아래 링크에서 확인할 수 있습니다.
+    </p>
+
+    <ul>
+      <li>
+        <a href="https://blog.naver.com/gkswlcjs2">
+          네이버 개발 블로그
+        </a>
+      </li>
+
+      <li>
+        <a href="https://m.blog.naver.com/gkswlcjs2/222496454152">
+          전체 블로그 글 모음
+        </a>
+      </li>
+
+      <li>
+        <a href="https://github.com/HJC96">
+          GitHub 프로젝트
+        </a>
+      </li>
+    </ul>
+
+  </section>
+
+</main>
+
+<footer>
+  <p>
+    © 2026 Han Ji Chan.
+    Backend Engineering Notes.
+  </p>
+
+  <p>
+    이 사이트는 개인 개발 경험과 학습 내용을
+    정리하기 위해 운영합니다.
+  </p>
+</footer>
+
 </body>
 </html>
